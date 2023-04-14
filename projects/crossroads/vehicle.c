@@ -76,20 +76,23 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 	}
 
 	/* lock next position */
-	if(lock_try_acquire(&vi->map_locks[pos_next.row][pos_next.col]))
-	{
-		if (vi->state == VEHICLE_STATUS_READY) {
-			/* start this vehicle */
-			vi->state = VEHICLE_STATUS_RUNNING;
-		} else {
-			/* release current position */
-			lock_release(&vi->map_locks[pos_cur.row][pos_cur.col]);
+	if (vi->state == VEHICLE_STATUS_READY) {
+		/* start this vehicle */
+		vi->state = VEHICLE_STATUS_RUNNING;
+		
+		struct position tmp_pos_next = vehicle_path[start][dest][step++];
+		while(tmp_pos_next.col != -1 || tmp_pos_next.row != -1)
+		{
+			lock_acquire(&vi->map_locks[tmp_pos_next.row][tmp_pos_next.col]);
+			tmp_pos_next = vehicle_path[start][dest][step++];
 		}
-		/* update position */
-		vi->position = pos_next;
-		return 1;
+	} else {
+		/* release current position */
+		lock_release(&vi->map_locks[pos_cur.row][pos_cur.col]);
 	}
-	return 2;
+	/* update position */
+	vi->position = pos_next;
+	return 1;
 }
 
 void init_on_mainthread(int thread_cnt){
