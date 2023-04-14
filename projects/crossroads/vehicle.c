@@ -75,6 +75,10 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 		}
 	}
 
+	if(step < 2){
+		while(!lock_try_acquire(&vi->map_locks[pos_next.row][pos_next.col]))
+			continue;
+	}
 	/* lock next position */
 	if (vi->state == VEHICLE_STATUS_READY) {
 		/* start this vehicle */
@@ -82,14 +86,16 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 	} else {
 		if(step == 2)
 		{
-			struct position tmp_pos_next = vehicle_path[start][dest][step++];
+			int tmp_step = step;
+			struct position tmp_pos_next = vehicle_path[start][dest][tmp_step++];
 			while(tmp_pos_next.col > 1 && tmp_pos_next.col < 5 && tmp_pos_next.row > 1 && tmp_pos_next.row < 5)
 			{
-				if(lock_try_acquire(&vi->map_locks[tmp_pos_next.row][tmp_pos_next.col]))
-					tmp_pos_next = vehicle_path[start][dest][step++];
+				while(!lock_try_acquire(&vi->map_locks[tmp_pos_next.row][tmp_pos_next.col]))
+					continue;
+				tmp_pos_next = vehicle_path[start][dest][tmp_step++];
 			}
 		}
-		if(pos_cur.col > 1 && pos_cur.col < 5 && pos_cur.row > 1 && pos_cur.row < 5)
+		if(step <= 2 || (pos_cur.col > 1 && pos_cur.col < 5 && pos_cur.row > 1 && pos_cur.row < 5))
 		{
 			/* release current position */
 			lock_release(&vi->map_locks[pos_cur.row][pos_cur.col]);
