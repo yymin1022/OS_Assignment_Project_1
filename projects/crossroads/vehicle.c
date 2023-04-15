@@ -88,6 +88,7 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 	pos_next = vehicle_path[start][dest][step];
 	pos_cur = vi->position;
 
+	moving_cnt++;
 	if (vi->state == VEHICLE_STATUS_RUNNING) {
 		/* check termination */
 		if (is_position_outside(pos_next)) {
@@ -128,6 +129,7 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 	}
 	/* update position */
 	vi->position = pos_next;
+	moving_cnt--;
 	return 1;
 }
 
@@ -135,6 +137,8 @@ void init_on_mainthread(int thread_cnt){
 	/* Called once before spawning threads */
 	global_sema = (struct semaphore*)malloc(sizeof(struct semaphore));
 	sema_init(global_sema, thread_cnt);
+	moving_cnt = 0;
+	total_cnt = thread_cnt;
 }
 
 void vehicle_loop(void *_vi)
@@ -153,18 +157,26 @@ void vehicle_loop(void *_vi)
 	step = 0;
 	while (1) {
 		/* vehicle main code */
-		res = try_move(start, dest, step, vi);
-		if (res == 1) {
-			step++;
+		if(sema_try_down(global_sema))
+		{
+			res = try_move(start, dest, step, vi);
+
+			if (res == 1) {
+				step++;
+			}
+
+			/* termination condition. */ 
+			if (res == 0) {
+				break;
+			}
+
+			/* unitstep change! */
+			unitstep_changed();
+		}else{
+			crossroads_step++;
+			sema_init(global_sema, total_cnt - moving_cnt);
 		}
 
-		/* termination condition. */ 
-		if (res == 0) {
-			break;
-		}
-
-		/* unitstep change! */
-		unitstep_changed();
 	}	
 
 	/* status transition must happen before sema_up */

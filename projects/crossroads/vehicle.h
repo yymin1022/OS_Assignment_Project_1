@@ -17,6 +17,8 @@ struct vehicle_info {
 	struct lock **map_locks;
 };
 
+int moving_cnt;
+int total_cnt;
 struct semaphore *global_sema;
 
 void vehicle_loop(void *vi);
