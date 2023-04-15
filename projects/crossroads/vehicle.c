@@ -136,7 +136,7 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 void init_on_mainthread(int thread_cnt){
 	/* Called once before spawning threads */
 	global_sema = (struct semaphore*)malloc(sizeof(struct semaphore));
-	sema_init(global_sema, thread_cnt);
+	sema_init(global_sema, 0);
 	moving_cnt = 0;
 	total_cnt = thread_cnt;
 }
