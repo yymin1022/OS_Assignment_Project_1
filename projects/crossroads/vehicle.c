@@ -101,8 +101,7 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 	}
 
 	if(step < 2){
-		while(!lock_try_acquire(&vi->map_locks[pos_next.row][pos_next.col]))
-			continue;
+		lock_acquire(&vi->map_locks[pos_next.row][pos_next.col]);
 	}
 	/* lock next position */
 	if (vi->state == VEHICLE_STATUS_READY) {
