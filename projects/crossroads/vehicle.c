@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-
+#include <stdlib.h>
 #include "threads/thread.h"
 #include "threads/synch.h"
 #include "projects/crossroads/vehicle.h"
@@ -133,6 +133,8 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 
 void init_on_mainthread(int thread_cnt){
 	/* Called once before spawning threads */
+	global_sema = (struct semaphore*)malloc(sizeof(struct semaphore));
+	sema_init(global_sema, thread_cnt);
 }
 
 void vehicle_loop(void *_vi)
