@@ -112,6 +112,7 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 			/* make tmp lock before lock inside crossroad */
 			tmp_lock_acquire(vi, pos_cur);
 
+			/* make lock of routes inside crossroad */
 			int tmp_step = step;
 			struct position tmp_pos_next = vehicle_path[start][dest][tmp_step++];
 			while(tmp_pos_next.col > 1 && tmp_pos_next.col < 5 && tmp_pos_next.row > 1 && tmp_pos_next.row < 5)
