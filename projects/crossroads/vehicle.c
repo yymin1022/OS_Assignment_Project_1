@@ -135,6 +135,7 @@ void init_on_mainthread(int thread_cnt){
 	/* Called once before spawning threads */
 	global_sema = (struct semaphore*)malloc(sizeof(struct semaphore));
 	sema_init(global_sema, 0);
+	
 	moving_cnt = 0;
 	total_cnt = thread_cnt;
 }
@@ -159,18 +160,18 @@ void vehicle_loop(void *_vi)
 		{
 			res = try_move(start, dest, step, vi);
 
-			if (res == 1) {
+			if (res == 1)
 				step++;
-			}
 
 			/* termination condition. */ 
-			if (res == 0) {
+			if (res == 0)
 				break;
-			}
 
 			/* unitstep change! */
 			unitstep_changed();
-		}else{
+		}
+		else
+		{
 			crossroads_step++;
 			sema_init(global_sema, total_cnt - moving_cnt);
 		}
