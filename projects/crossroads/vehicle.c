@@ -56,26 +56,42 @@ static int is_position_outside(struct position pos)
 	return (pos.row == -1 || pos.col == -1);
 }
 
-static void tmp_lock(struct vehicle_info *vi, struct position pos_cur)
+static void tmp_lock_acquire(struct vehicle_info *vi, struct position pos_cur)
 {
 	if(pos_cur.row == 1)
 	{
 		lock_acquire(&vi->map_locks[2][3]);
-		lock_release(&vi->map_locks[2][3]);
 	}
 	else if(pos_cur.row == 2)
 	{
 		lock_acquire(&vi->map_locks[3][4]);
-		lock_release(&vi->map_locks[3][4]);
 	}
 	else if(pos_cur.row == 4)
 	{
 		lock_acquire(&vi->map_locks[3][2]);
-		lock_release(&vi->map_locks[3][2]);
 	}
 	else if(pos_cur.row == 5)
 	{
 		lock_acquire(&vi->map_locks[4][3]);
+	}
+}
+
+static void tmp_lock_release(struct vehicle_info *vi, struct position pos_cur)
+{
+	if(pos_cur.row == 1)
+	{
+		lock_release(&vi->map_locks[2][3]);
+	}
+	else if(pos_cur.row == 2)
+	{
+		lock_release(&vi->map_locks[3][4]);
+	}
+	else if(pos_cur.row == 4)
+	{
+		lock_release(&vi->map_locks[3][2]);
+	}
+	else if(pos_cur.row == 5)
+	{
 		lock_release(&vi->map_locks[4][3]);
 	}
 }
@@ -110,7 +126,7 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 	} else {
 		if(step == 2)
 		{
-			tmp_lock(vi, pos_cur);
+			tmp_lock_acquire(vi, pos_cur);
 			int tmp_step = step;
 			struct position tmp_pos_next = vehicle_path[start][dest][tmp_step++];
 			while(tmp_pos_next.col > 1 && tmp_pos_next.col < 5 && tmp_pos_next.row > 1 && tmp_pos_next.row < 5)
@@ -119,6 +135,7 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 					continue;
 				tmp_pos_next = vehicle_path[start][dest][tmp_step++];
 			}
+			tmp_lock_release(vi, pos_cur);
 		}
 		if(step <= 2 || (pos_cur.col > 1 && pos_cur.col < 5 && pos_cur.row > 1 && pos_cur.row < 5))
 		{
