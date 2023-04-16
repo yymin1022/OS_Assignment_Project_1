@@ -142,6 +142,13 @@ void init_on_mainthread(int thread_cnt){
 	global_sema = (struct semaphore*)malloc(sizeof(struct semaphore));
 	sema_init(global_sema, 0);
 	
+	/* moving_cnt means Count of Currently Moving Car                  */
+	/* If a car is in Busy Wait, or waiting for Entrance of Crossroad, */
+	/* moving_cnt value will not be 0                                  */
+	/* This value is used for carculating global_sema Semaphore Offset */
+	/* global_sema is used for calculating Step Count                  */
+	/* If global_sema is 0 so sema_try_down returns false,             */
+	/* It is recognized as All of cars moved and 1 Step is done        */
 	moving_cnt = 0;
 	total_cnt = thread_cnt;
 }
