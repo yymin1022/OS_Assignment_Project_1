@@ -59,41 +59,25 @@ static int is_position_outside(struct position pos)
 static void tmp_lock_acquire(struct vehicle_info *vi, struct position pos_cur)
 {
 	if(pos_cur.row == 1)
-	{
 		lock_acquire(&vi->map_locks[2][3]);
-	}
 	else if(pos_cur.row == 2)
-	{
 		lock_acquire(&vi->map_locks[3][4]);
-	}
 	else if(pos_cur.row == 4)
-	{
 		lock_acquire(&vi->map_locks[3][2]);
-	}
 	else if(pos_cur.row == 5)
-	{
 		lock_acquire(&vi->map_locks[4][3]);
-	}
 }
 
 static void tmp_lock_release(struct vehicle_info *vi, struct position pos_cur)
 {
 	if(pos_cur.row == 1)
-	{
 		lock_release(&vi->map_locks[2][3]);
-	}
 	else if(pos_cur.row == 2)
-	{
 		lock_release(&vi->map_locks[3][4]);
-	}
 	else if(pos_cur.row == 4)
-	{
 		lock_release(&vi->map_locks[3][2]);
-	}
 	else if(pos_cur.row == 5)
-	{
 		lock_release(&vi->map_locks[4][3]);
-	}
 }
 
 /* return 0:termination, 1:success, -1:fail */
