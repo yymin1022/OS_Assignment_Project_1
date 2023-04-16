@@ -110,8 +110,6 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 		if (is_position_outside(pos_next)) {
 			/* actual move */
 			vi->position.row = vi->position.col = -1;
-			/* release previous */
-			//lock_release(&vi->map_locks[pos_cur.row][pos_cur.col]);
 			return 0;
 		}
 	}
