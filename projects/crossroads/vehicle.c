@@ -175,7 +175,14 @@ void vehicle_loop(void *_vi)
 		if(sema_try_down(global_sema))
 		{
 			if(step == 2)
-				sema_down(intersect_sema);
+			{
+				if(!sema_try_down(intersect_sema))
+				{
+					moving_cnt++;
+					sema_down(intersect_sema);
+					moving_cnt--;
+				}
+			}
 			if(step == 3)
 				sema_up(intersect_sema);
 			res = try_move(start, dest, step, vi);
