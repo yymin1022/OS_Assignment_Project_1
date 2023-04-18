@@ -140,7 +140,9 @@ static int try_move(int start, int dest, int step, struct vehicle_info *vi)
 void init_on_mainthread(int thread_cnt){
 	/* Called once before spawning threads */
 	global_sema = (struct semaphore*)malloc(sizeof(struct semaphore));
+	intersect_sema = (struct semaphoree*)malloc(sizeof(struct semaphore));
 	sema_init(global_sema, 0);
+	sema_init(intersect_sema, 3);
 	
 	/* moving_cnt means Count of Currently Moving Car                  */
 	/* If a car is in Busy Wait, or waiting for Entrance of Crossroad, */
@@ -149,6 +151,7 @@ void init_on_mainthread(int thread_cnt){
 	/* global_sema is used for calculating Step Count                  */
 	/* If global_sema is 0 so sema_try_down returns false,             */
 	/* It is recognized as All of cars moved and 1 Step is done        */
+	intersect_cnt = 0;
 	moving_cnt = 0;
 	total_cnt = thread_cnt;
 }
