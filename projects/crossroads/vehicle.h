@@ -20,6 +20,7 @@ struct vehicle_info {
 int moving_cnt;
 int total_cnt;
 struct semaphore *global_sema;
+struct semaphore *intersect_sema;
 
 void vehicle_loop(void *vi);
 
