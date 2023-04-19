@@ -177,8 +177,18 @@ void vehicle_loop(void *_vi)
 	step = 0;
 	while (1) {
 		/* vehicle main code */
+		/* global_sema is used for checking crossroads_step is increased    */
+		/* If some car is blocked (moving_cnt > 0), and global_sema is 0,   */
+		/* It means all movable cars are moved, so crossroads_step++        */
+		/* and re-initialize global_sema to total_cnt - moving_cnt          */
+		/* If global_sema is not 0, it means all movable cars did not moved */
+		/* so crossroads_step is not increased. Other car will move more.   */
 		if(sema_try_down(global_sema))
 		{
+			/* If step is 2, car is at entrance of intersection         */
+			/* Check intersect_sema Semaphore value, and if it is 0,    */
+			/* So sema_try_down fails, it will increase moving_cnt.     */
+
 			if(step == 2)
 			{
 				if(!sema_try_down(intersect_sema))
